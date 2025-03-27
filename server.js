@@ -18,7 +18,7 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 console.log("REDIRECT_URI:", REDIRECT_URI);
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro";
 
-app.post("/auth/google/callback", async (req, res) => {
+app.get("/auth/google/callback", async (req, res) => {
     const { code } = req.query;
 
     if (!code) {
@@ -79,5 +79,5 @@ app.get("/api/user", verifyToken, (req, res) => {
     res.json({ user: req.user });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`✅ Servidor corriendo en el puerto ${PORT}`));
