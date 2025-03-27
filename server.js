@@ -50,7 +50,9 @@ app.get("/auth/google/callback", async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        res.json({ token: jwtToken, user: userInfo.data });
+        // ✅ Redirigir a la app Expo usando un deep link
+        const appRedirectURI = `myapp://auth/google/callback?token=${jwtToken}`;
+        return res.redirect(appRedirectURI);
     } catch (error) {
         console.error("Error al autenticar:", error.response?.data || error.message);
         res.status(500).json({ error: "Error al intercambiar código por token" });
