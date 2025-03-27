@@ -19,13 +19,18 @@ console.log("REDIRECT_URI:", REDIRECT_URI);
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro";
 
 app.all("/auth/google/callback", async (req, res) => {
-    const code = req.body.code || req.query.code; // Soporta `POST` y `GET`
+    console.log("🔹 Recibida petición en /auth/google/callback");
+
+    const code = req.query.code;
+    console.log("🔹 Código recibido:", code);
 
     if (!code) {
+        console.log("⚠️ No se recibió código de autenticación");
         return res.status(400).json({ error: "Código de autorización no recibido" });
     }
 
     try {
+        console.log("🔹 Intercambiando código por token...");
         const { data } = await axios.post("https://oauth2.googleapis.com/token", null, {
             params: {
                 client_id: CLIENT_ID,
@@ -36,31 +41,31 @@ app.all("/auth/google/callback", async (req, res) => {
             },
         });
 
+        console.log("✅ Token recibido:", data.access_token);
+
         const userInfo = await axios.get("https://www.googleapis.com/oauth2/v2/userinfo", {
             headers: { Authorization: `Bearer ${data.access_token}` },
         });
+
+        console.log("✅ Usuario autenticado:", userInfo.data);
 
         const jwtToken = jwt.sign(
             {
                 id: userInfo.data.id,
                 email: userInfo.data.email,
                 name: userInfo.data.name,
-                picture: userInfo.data.picture, // ✅ Guardamos la foto de perfil
+                picture: userInfo.data.picture,
             },
             JWT_SECRET,
             { expiresIn: "7d" }
         );
 
-        // 🔴 SOLUCIÓN: Redirigir a una página de cierre
-        return res.send(`
-            <script>
-                window.localStorage.setItem("token", "${jwtToken}");
-                window.localStorage.setItem("user", JSON.stringify(${JSON.stringify(userInfo.data)}));
-                window.close();
-            </script>
-        `);
+        console.log("✅ JWT generado:", jwtToken);
+
+        // Redirige de vuelta a la app con el token
+        return res.redirect(`${process.env.APP_REDIRECT_URI}?token=${jwtToken}`);
     } catch (error) {
-        console.error("Error al autenticar:", error.response?.data || error.message);
+        console.error("❌ Error al autenticar:", error.response?.data || error.message);
         res.status(500).json({ error: "Error al intercambiar código por token" });
     }
 });
