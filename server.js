@@ -10,8 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro";
 
