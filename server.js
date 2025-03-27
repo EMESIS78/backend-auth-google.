@@ -18,8 +18,8 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 console.log("REDIRECT_URI:", REDIRECT_URI);
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro";
 
-app.get("/auth/google/callback", async (req, res) => {
-    const { code } = req.query;
+app.all("/auth/google/callback", async (req, res) => {
+    const code = req.body.code || req.query.code; // Soporta `POST` y `GET`
 
     if (!code) {
         return res.status(400).json({ error: "Código de autorización no recibido" });
@@ -45,14 +45,13 @@ app.get("/auth/google/callback", async (req, res) => {
                 id: userInfo.data.id,
                 email: userInfo.data.email,
                 name: userInfo.data.name,
+                picture: userInfo.data.picture, // ✅ Guardamos la foto de perfil
             },
             JWT_SECRET,
             { expiresIn: "7d" }
         );
 
-        // ✅ Redirigir a la app Expo usando un deep link
-        const appRedirectURI = `myapp://auth/google/callback?token=${jwtToken}`;
-        return res.redirect(appRedirectURI);
+        return res.json({ token: jwtToken, user: userInfo.data });
     } catch (error) {
         console.error("Error al autenticar:", error.response?.data || error.message);
         res.status(500).json({ error: "Error al intercambiar código por token" });
