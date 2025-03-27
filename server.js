@@ -51,7 +51,14 @@ app.all("/auth/google/callback", async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        return res.json({ token: jwtToken, user: userInfo.data });
+        // 🔴 SOLUCIÓN: Redirigir a una página de cierre
+        return res.send(`
+            <script>
+                window.localStorage.setItem("token", "${jwtToken}");
+                window.localStorage.setItem("user", JSON.stringify(${JSON.stringify(userInfo.data)}));
+                window.close();
+            </script>
+        `);
     } catch (error) {
         console.error("Error al autenticar:", error.response?.data || error.message);
         res.status(500).json({ error: "Error al intercambiar código por token" });
