@@ -18,8 +18,8 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 console.log("REDIRECT_URI:", REDIRECT_URI);
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro";
 
-app.all("/auth/google/callback", async (req, res) => {
-    const code = req.body.code || req.query.code; // Soporta `POST` y `GET`
+app.get("/auth/google/callback", async (req, res) => {
+    const { code } = req.query;
 
     if (!code) {
         return res.status(400).json({ error: "Código de autorización no recibido" });
@@ -45,13 +45,15 @@ app.all("/auth/google/callback", async (req, res) => {
                 id: userInfo.data.id,
                 email: userInfo.data.email,
                 name: userInfo.data.name,
-                picture: userInfo.data.picture, // ✅ Guardamos la foto de perfil
+                picture: userInfo.data.picture,
             },
             JWT_SECRET,
             { expiresIn: "7d" }
         );
 
-        // 🔴 SOLUCIÓN: Redirigir a una página de cierre
+        console.log("✅ JWT generado:", jwtToken);
+
+        // Redirige de vuelta a la app con el token
         return res.redirect(`${process.env.APP_REDIRECT_URI}?token=${jwtToken}`);
     } catch (error) {
         console.error("Error al autenticar:", error.response?.data || error.message);
