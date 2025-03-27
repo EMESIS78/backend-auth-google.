@@ -54,7 +54,7 @@ app.get("/auth/google/callback", async (req, res) => {
         console.log("✅ JWT generado:", jwtToken);
 
         // Redirige de vuelta a la app con el token
-        return res.redirect(`${process.env.APP_REDIRECT_URI}?token=${jwtToken}`);
+        return res.redirect(`${process.env.EXPO_REDIRECT_URI}?token=${jwtToken}`);
     } catch (error) {
         console.error("Error al autenticar:", error.response?.data || error.message);
         res.status(500).json({ error: "Error al intercambiar código por token" });
