@@ -11,8 +11,11 @@ app.use(cors());
 app.use(express.json());
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+console.log("CLIENT_ID:", GOOGLE_CLIENT_ID);
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+console.log("CLIENT_SECRET:", GOOGLE_CLIENT_SECRET ? "Cargado ✅" : "No cargado ❌");
 const REDIRECT_URI = process.env.REDIRECT_URI;
+console.log("REDIRECT_URI:", REDIRECT_URI);
 const JWT_SECRET = process.env.JWT_SECRET || "secreto_super_seguro";
 
 app.post("/auth/google/callback", async (req, res) => {
